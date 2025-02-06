@@ -11,7 +11,7 @@ async function getPost(req, res) {
     res.end(JSON.stringify(posts))
   } catch (error) {
     res.writeHead(404, { 'content-type': 'application/json' })
-    res.end(JSON.stringify({ message: `Error in getting data ${error}` }))
+    res.end(JSON.stringify({ message: `Error in getting all data ${error}` }))
   }
 }
 
@@ -46,6 +46,23 @@ async function getSinglePost(req, res, id) {
   }
 }
 
+//? @desc    Delete one post
+//! @route   /api/post/{id}
+async function deleteSinglePost(req, res, id) {
+  try {
+    const post = await Post.deletePost(id)
+    if (!post) {
+      res.writeHead(404, { 'content-type': 'application/json' })
+      res.end(JSON.stringify({ message: 'no post found to delete' }))
+    } else {
+      res.writeHead(200, { 'content-type': 'application/json' })
+      res.end(JSON.stringify(post))
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 //? @desc    Update one post
 //! @route   /api/post/{id}
 async function updateSinglePost(req, res, id) {
@@ -54,7 +71,7 @@ async function updateSinglePost(req, res, id) {
     const post = await Post.updatePost(id, postData)
     if (!post) {
       res.writeHead(404, { 'content-type': 'application/json' })
-      res.end(JSON.stringify({ message: 'no post found' }))
+      res.end(JSON.stringify({ message: 'no post found to update' }))
     } else {
       res.writeHead(200, { 'content-type': 'application/json' })
       res.end(JSON.stringify(post))
@@ -69,6 +86,7 @@ module.exports = {
   getPost,
   getSinglePost,
   insertPostToDB,
-  updateSinglePost
+  updateSinglePost,
+  deleteSinglePost
 }
 

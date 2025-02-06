@@ -61,7 +61,8 @@ const updatePost = async (id, updatedData) => {
 
 const deletePost = async (id) => {
   try {
-    await Post.findOneAndDelete({ id: Number(id) }).exec()
+    const deletedPost = await Post.findOneAndDelete({ id: Number(id) }).exec()
+    return deletedPost
   } catch (error) {
     console.error(error)
   }
