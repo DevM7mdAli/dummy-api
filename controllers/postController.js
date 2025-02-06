@@ -1,4 +1,5 @@
 const Post = require('../models/postModal')
+const { getBody } = require('../utils')
 
 
 //? @desc    Gets All posts
@@ -18,18 +19,10 @@ async function getPost(req, res) {
 //! @route   /api/post
 async function insertPostToDB(req, res) {
   try {
-    let body = ''
-    req.on('data', (chunk) => {
-      body += chunk.toString()
-      console.log(chunk)
-    })
-
-    req.on('end', async () => {
-      const postData = JSON.parse(body) //! because it is a string not a javaScript code
-      const post = await Post.insertPost(postData)
-      res.writeHead(201, { 'content-type': 'application/json' })
-      res.end(JSON.stringify(post))
-    })
+    const postData = await getBody(req)
+    const post = await Post.insertPost(postData)
+    res.writeHead(201, { 'content-type': 'application/json' })
+    res.end(JSON.stringify(post))
   } catch (error) {
     res.writeHead(404, { 'content-type': 'application/json' })
     res.end(JSON.stringify({ message: `Error in inserting data ${error}` }))
@@ -53,11 +46,29 @@ async function getSinglePost(req, res, id) {
   }
 }
 
+//? @desc    Update one post
+//! @route   /api/post/{id}
+async function updateSinglePost(req, res, id) {
+  try {
+    const postData = await getBody(req)
+    const post = await Post.updatePost(id, postData)
+    if (!post) {
+      res.writeHead(404, { 'content-type': 'application/json' })
+      res.end(JSON.stringify({ message: 'no post found' }))
+    } else {
+      res.writeHead(200, { 'content-type': 'application/json' })
+      res.end(JSON.stringify(post))
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 
 module.exports = {
   getPost,
   getSinglePost,
-  insertPostToDB
+  insertPostToDB,
+  updateSinglePost
 }
 
